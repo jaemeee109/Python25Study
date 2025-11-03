@@ -16,7 +16,7 @@ import ep # 종료 시 파일 저장 / 갱신
 #재고 및 물품 정보를 텍스트 파일에서 읽기
 # goods : {상품번호: {"분류":str,"품목":str,"가격":str,"재고":int}}
 # day_sale : {상품번호: int, "card":int, "cash":int}
-f = open("재고/goods.txt", "r", encoding="cp949")
+f = open("재고/goods.txt", "r", encoding="utf-8")
 goods ={}                       # 물품 정보 및 재고 저장
 day_sale = {"card":0,"cash":0}  # 일 매출 정보 저장 (결제수단, 합계)
 
