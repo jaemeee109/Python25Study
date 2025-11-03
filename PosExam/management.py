@@ -9,21 +9,43 @@ import datetime as t
 
 # 월 매출을 파일에서 읽어와서 딕셔너리 형태로 저장한 다음 반환
 def month_margin(month) :
+    import os   # 파일 존재 여부 확인을 위해 표준 모듈 os 임포트
+
     
-    f = open("관리/"+month+"-total.txt",'r')
+    path = "관리/"+month+"-total.txt" # 읽고/생성할 월 매출 파일
     tmp_dic = {}    # 최종 반환 딕셔너리
     tmp_month = {}  # 월 내부 항목 딕셔너리
 
-    while True :
-        line = f.readline()
-        if line == '' :
+    # 파일 없으면 0으로 초기 생성 (card/cash만 우선)
+    if not os.path.exists(path) :   # 해당 파일이 없는 첫 실행 상황인지 검사
+        f = open(path,'w')          # 없으면 'w' 모드로 새 파일 생성 (기존 파일이 있다면 덮어씀)
+        f.write("card/0\n")         # 기본 결제수단 card를 0으로 초기화하여 기록
+        f.write("cash/0\n")         # 기본 결제수단 cash를 0으로 초기화하여 기록
+        f.close()                   # 파일 닫기 (리소스 반납)
+        tmp_month['card'] = 0       # 메모리 상 딕셔너리에도 동일한 초기 상태 반영
+        tmp_month['cash'] = 0       # cash 키도 0으로 초기 반영
+        tmp_dic[month] = tmp_month  # 바깥 딕셔너리에 담기
+        return tmp_dic              # 초기 생성된 결과를 즉시 반환
+
+    # 파일이 있으면 읽어서 로드
+    f = open(path, 'r')         # 파일이 존재할 경우 읽기 모드로 오픈
+    while True:                 # 파일 끝까지 한 줄씩 읽는 루프
+        line = f.readline()     # 한 줄 일기
+        if line == '':          # 빈 문자열이면 EOF (파일 끝) → 반복종료
             break
         line = line.rstrip('\n')
+        if line == '':
+            continue
         tmp_list = line.split('/')
-        tmp_month[tmp_list[0]] = int(tmp_list[1]) # 키/값 로드
+        tmp_month[tmp_list[0]] = int(tmp_list[1])
+
+    # card/cash 키가 누락된 파일 대비 보정
+    if 'card' not in tmp_month:
+        tmp_month['card'] = 0
+    if 'cash' not in tmp_month:
+        tmp_month['cash'] = 0
 
     tmp_dic[month] = tmp_month
-
     return tmp_dic
 
 # # 일매출/월매출 조회 UI

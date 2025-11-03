@@ -11,10 +11,12 @@ import gmanagement # 재고관리 (현황/발주) UI
 import ep # 종료 시 파일 저장 / 갱신
 
 
+
+
 #재고 및 물품 정보를 텍스트 파일에서 읽기
 # goods : {상품번호: {"분류":str,"품목":str,"가격":str,"재고":int}}
 # day_sale : {상품번호: int, "card":int, "cash":int}
-f = open("재고/goods.txt","r") # 재고 원본 파일 오픈
+f = open("재고/goods.txt", "r", encoding="cp949")
 goods ={}                       # 물품 정보 및 재고 저장
 day_sale = {"card":0,"cash":0}  # 일 매출 정보 저장 (결제수단, 합계)
 
@@ -22,7 +24,7 @@ day_sale = {"card":0,"cash":0}  # 일 매출 정보 저장 (결제수단, 합계
 while(True) :
     tmp_dic = {} # 한 상품의 속성 임시 저장
     line = f.readline() # 한 줄 읽기
-    line = line.rstrip("\n"); # 오른쪽 끝에있는 \n 제거
+    line = line.rstrip("\n") # 오른쪽 끝에있는 \n 제거
     if(line==""):   # EOF(빈줄)면 종료
         break
     
@@ -36,6 +38,24 @@ while(True) :
     goods[st_list[0]] = tmp_dic # goods(딕셔너리)에 저장
     day_sale[st_list[0]] = 0 # 품목별 일 매출 초기값 0으로 저장
     
+#  일매출 누적
+import os, datetime as t
+_now = t.datetime.now()
+_MM = f"{_now.month:02d}"
+_DD = f"{_now.day:02d}"
+_day_path = f"관리/{_MM}{_DD}.txt"
+
+if os.path.exists(_day_path):
+    with open(_day_path, "r") as _f:
+        for _line in _f:
+            _line = _line.strip()
+            if not _line:
+                continue
+            _k, _v = _line.split("/")
+            _v = int(_v)
+            # 기존에 있는 키면 덮어쓰고, 없던 키면 추가
+            day_sale[_k] = _v
+
 
 # 메인 메뉴 루프
 

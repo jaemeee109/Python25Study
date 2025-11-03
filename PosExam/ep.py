@@ -39,8 +39,10 @@ def make_month_sale(month,day_sale) :
     
     # 키별로 기존 월매출 + 오늘 일매출
     for i in month_sale.keys() :
-        total = month_sale[i] + day_sale[i]
-        f_dic[i] = total
+        prev = month_sale[i] if i in month_sale else 0 # 안전 가드 : month_sale에 키가 있으면 그 값,
+        f_dic[i] = prev + day_sale[i]                  # 없으면 0 (현재 루프에선 항상 존재)
+                                                       # 당일(day_sale)의 같은 키 금액을 더해 누적값으로 저장
+                                                       # (키가 day_sale에 없으면 KeyError 위험)
     
     f = open("관리/"+month+"-total.txt","w")
 
